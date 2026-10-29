@@ -1,4 +1,4 @@
-package com.epam.spring_boot_task;
+package com.epam.demo;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

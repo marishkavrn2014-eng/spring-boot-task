@@ -1,4 +1,4 @@
-package com.epam.spring_boot_task;
+package com.epam.demo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
