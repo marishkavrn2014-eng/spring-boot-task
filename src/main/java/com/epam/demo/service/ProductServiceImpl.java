@@ -3,6 +3,8 @@ package com.epam.demo.service;
 import com.epam.demo.entity.Product;
 import com.epam.demo.exception.ResourceNotFoundException;
 import com.epam.demo.repository.ProductRepository;
+import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,13 +13,21 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final MeterRegistry meterRegistry;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, MeterRegistry meterRegistry) {
         this.productRepository = productRepository;
+        this.meterRegistry = meterRegistry;
+    }
+
+    @PostConstruct
+    public void initMetrics() {
+        meterRegistry.gauge("products.total", productRepository.count());
     }
 
     @Override
     public List<Product> getAllProducts() {
+        meterRegistry.counter("products.read.total").increment();
         return productRepository.findAll();
     }
 
@@ -29,7 +39,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product createProduct(Product product) {
-        return productRepository.save(product);
+        Product saved = productRepository.save(product);
+        meterRegistry.counter("products.created.total").increment();
+        return saved;
     }
 
     @Override
